@@ -1,6 +1,7 @@
 package com.bootcamp.microservicemeetup.repository;
 
 import com.bootcamp.microservicemeetup.model.entity.Registration;
+import com.bootcamp.microservicemeetup.utils.FakeObjectCreator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,21 +21,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 public class RegistrationRepositoryTest {
 
-
     @Autowired
     TestEntityManager entityManager;
-
     @Autowired
     RegistrationRepository repository;
 
+    @Test
+    @DisplayName("Teste para verificar se o registro foi criado")
+    public void findByRegistrationTest() {
+        //given
+        Registration registration_Class_attribute = FakeObjectCreator.createRegistration("323");
+        entityManager.persist(registration_Class_attribute);
+        //when
+        Optional<Registration> foundRegistration = repository.findByRegistration(registration_Class_attribute.getRegistration());
+        //then
+        assertThat(foundRegistration.isPresent()).isTrue();
+    }
 
     @Test
-    @DisplayName("Should return true when exists an registration already created.")
+    @DisplayName("Deve retornar true quando existe um registro já criado.")
     public void returnTrueWhenRegistrationExists() {
 
         String registration = "123";
 
-        Registration registration_Class_attribute = createNewRegistration(registration);
+        Registration registration_Class_attribute = FakeObjectCreator.createRegistration(registration);
         entityManager.persist(registration_Class_attribute);
 
         boolean exists = repository.existsByRegistration(registration);
@@ -43,7 +53,7 @@ public class RegistrationRepositoryTest {
     }
 
     @Test
-    @DisplayName("Should return false when doesn't exists an registration_attribute with a registration already created.")
+    @DisplayName("Deve retornar false quando não existe um registration_attribute com um registro já criado.")
     public void returnFalseWhenRegistrationAttributeDoesntExists() {
 
         String registration = "123";
@@ -55,10 +65,10 @@ public class RegistrationRepositoryTest {
     }
 
     @Test
-    @DisplayName("Should get an registration by id")
+    @DisplayName("Deve obter um registro por id")
     public void findByIdTest() {
 
-        Registration registration_Class_attribute = createNewRegistration("323");
+        Registration registration_Class_attribute = FakeObjectCreator.createRegistration("323");
         entityManager.persist(registration_Class_attribute);
 
         Optional<Registration> foundRegistration = repository
@@ -69,10 +79,10 @@ public class RegistrationRepositoryTest {
     }
 
     @Test
-    @DisplayName("Should save an registration")
+    @DisplayName("Deve salvar um registro")
     public void saveRegistrationTest() {
 
-        Registration registration_Class_attribute = createNewRegistration("323");
+        Registration registration_Class_attribute = FakeObjectCreator.createRegistration("323");
 
         Registration savedRegistration = repository.save(registration_Class_attribute);
 
@@ -81,10 +91,10 @@ public class RegistrationRepositoryTest {
     }
 
     @Test
-    @DisplayName("Should delete and registration from the base")
+    @DisplayName("Deve excluir e registro da base de dados")
     public void deleteRegistation() {
 
-        Registration registration_Class_attribute = createNewRegistration("323");
+        Registration registration_Class_attribute = FakeObjectCreator.createRegistration("323");
         entityManager.persist(registration_Class_attribute);
 
         Registration foundRegistration = entityManager
@@ -98,14 +108,23 @@ public class RegistrationRepositoryTest {
 
     }
 
+    @Test
+    @DisplayName("Deve atualizar um registro")
+    public void updateRegistration() {
 
+        Registration registration_Class_attribute = FakeObjectCreator.createRegistration("323");
+        entityManager.persist(registration_Class_attribute);
 
+        Registration foundRegistration = entityManager
+                .find(Registration.class, registration_Class_attribute.getId());
 
+        foundRegistration.setRegistration("123");
 
-    public static Registration createNewRegistration(String registration) {
-        return Registration.builder()
-                .name("Ana Neri")
-                .dateOfRegistration("10/10/2021")
-                .registration(registration).build();
+        Registration updatedRegistration = repository.save(foundRegistration);
+
+        assertThat(updatedRegistration.getRegistration()).isEqualTo("123");
+
     }
+
+
 }

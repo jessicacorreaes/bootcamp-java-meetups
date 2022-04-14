@@ -26,9 +26,9 @@ public class Meetup {
     // mtos meetups para 1 registro - registro só pode ir em um meetup
     private Registration registration;
 
-    @Column
+    @Column(name = "meetupDate")
     private String meetupDate;
 
-    @Column
+    @Column(name = "registered")
     private Boolean registered;
 }
